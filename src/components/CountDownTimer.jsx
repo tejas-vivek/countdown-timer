@@ -2,12 +2,19 @@ import React, { useEffect, useState } from "react";
 import Timer from "./Timer";
 import { BsFillPlayFill, BsPauseFill, BsStopFill } from "react-icons/bs";
 
+document.body.style.background="#282c34"
+
 export default function CountDownTimer() {
   const [hours, setHours] = useState(0);
   const [mins, setMins] = useState(0);
   const [sec, setSec] = useState(0);
   const [milisec, setMilisec] = useState(0);
   const [isRunning, setIsRunning] = useState(null);
+
+  const [showEndScreen, setShowEndScreen] = useState({
+    show: false,
+    message: "Restart your countdown",
+  });
 
   useEffect(() => {
     let interval;
@@ -30,28 +37,34 @@ export default function CountDownTimer() {
         }
       }, 10);
     }
+    if(hours === 0 && mins === 0 && sec === 0 && milisec === 1){
+        setShowEndScreen({...showEndScreen, show:true});
+        resetTimer();
+    }
     return () => clearInterval(interval);
-  }, [milisec, sec, mins, hours, isRunning]);
+  }, [milisec, sec, mins, hours, isRunning, showEndScreen.show]);
 
   //Start timers
-  function startTimer(){
-    if(hours !== 0 || mins !== 0 || sec !== 0 || milisec !== 0){
-        setIsRunning(true);
+  function startTimer() {
+    if (hours !== 0 || mins !== 0 || sec !== 0 || milisec !== 0) {
+      setIsRunning(true);
+      setShowEndScreen({...showEndScreen, show:false});
     } else {
-        window.alert("Add time");
+      window.alert("Add time");
     }
   }
 
   //Pause timer
-  function pauseTimer(){
+  function pauseTimer() {
     setIsRunning(false);
   }
 
-  function stopTimer(){
+  function stopTimer() {
     resetTimer();
+    setShowEndScreen({...showEndScreen, show:false});
   }
 
-  function resetTimer(){
+  function resetTimer() {
     setIsRunning(false);
     setMilisec(0);
     setSec(0);
@@ -71,7 +84,7 @@ export default function CountDownTimer() {
   };
   return (
     <div>
-      <h1 className="title">Restart your countdown</h1>
+      {showEndScreen.show && <h1 className="title text-light">{showEndScreen.message}</h1>}
       <Timer
         milisec={milisec}
         sec={sec}
